@@ -1,0 +1,7 @@
+Bugs to be fixed:
+    Tee (rot 1 & 3) when dropped in bottom right of board glitches
+
+    Can't move blocks to the right
+
+Bugs that can't be recreated:
+    block renders on row 8 (empty board)
