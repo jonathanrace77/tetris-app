@@ -1,9 +1,10 @@
 function lineFull(
-  board,
-  score
+  board
 ) {
   let count;
-  let comboCount = 0;
+  let lineFullComboCount = 0;
+
+console.log('comboCount into linefull', lineFullComboCount);
 
   for (let k = 19; k > 0; k--) {
     count = 0;
@@ -12,22 +13,21 @@ function lineFull(
         count++;
       }
     }
+    // If line is full
     if (count === 10) {
-      
       // Move everything down one
       for (let m = k; m > 0; m--) {
         for (let n = 0; n <= 9; n++) {
           board[m][n] = board[m - 1][n];
         }
       }
-      comboCount++;
+      lineFullComboCount++;
       k = 19;
-    }
+      
+    }  
   }
 
-  //console.log('Checkpoint 5 - Success', score + comboCount * 100);
-
-  return [board, score + comboCount * 100];
+  return [board, lineFullComboCount];
 }
 
 export default lineFull;

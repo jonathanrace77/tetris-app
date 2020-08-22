@@ -17,9 +17,6 @@ function BlockDrop(
     x = 10 - cBlockWidth;
   }
 
-  
-
-
   cBlockX = x;
 
   if (cBlockType === "line") {

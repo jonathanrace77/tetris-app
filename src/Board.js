@@ -32,22 +32,22 @@ class Board extends React.Component {
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 0, 1, 1, 1, 1],
       ],
       dropSpeed: 450,
       key: 0,
       x: 3,
       fallTimerCount: 0,
-      cBlockType: shapeGen(),
+      cBlockType: 'line', //shapeGen(),
       cBlockX: 0,
       cBlockY: 0,
       cBlockRot: 0,
-      cBlockWidth: 4,
       cBlockMaxWidth: 4,
       canMove: 1,
       renderComplete: 1,
       score: 100,
       isDownPressed: 0,
+      comboCount: 5,
     };
     this.boardCreator = this.boardCreator.bind(this);
     this.fallLogic = this.fallLogic.bind(this);
@@ -109,7 +109,6 @@ class Board extends React.Component {
             "right"
           )
         ) {
-          console.log('Checkpoint 3 - Success', this.state.x);
           return { x: prevState.x++ };
         }
       });
@@ -193,8 +192,6 @@ class Board extends React.Component {
     // Loop for blocks to drop
     setInterval(
       function () {
-
-
         this.setState((prevState) => {
           var board = prevState.board;
           var key = prevState.key;
@@ -281,6 +278,10 @@ class Board extends React.Component {
           return {
             board: board,
             fallTimerCount: fallTimerCount + additionalCount,
+            cBlockWidth: CalculateBlockWidth(
+              this.state.cBlockType,
+              this.state.cBlockRot
+            ),
           };
         });
       }.bind(this),
@@ -302,6 +303,8 @@ class Board extends React.Component {
           var cBlockMaxWidth = prevState.cBlockMaxWidth;
           var cBlockRot = prevState.cBlockRot;
           var score = prevState.score;
+          var comboCount = prevState.comboCount;
+          let comboToSend;
 
           //newTimerCount = prevState.fallTimerCount++;
 
@@ -321,17 +324,26 @@ class Board extends React.Component {
             }
           } else {
             // Check for a complete line
-            let checkLineComplete = lineFull(board, score);
-            board = checkLineComplete[0];
-            let newScore = checkLineComplete[1];
-            this.setState({ score: newScore });
+
+
+            
 
             newTimerCount = 0;
-            //canMove = 1;
             cBlockType = shapeGen();
             cBlockWidth = CalculateBlockWidth(cBlockType, 0);
             cBlockRot = 0;
             x = 3;
+
+
+            let checkLineComplete = lineFull(board, comboCount);
+            board = checkLineComplete[0];
+            comboCount = checkLineComplete[1];
+            
+            
+            if(comboCount != 0){
+              comboToSend = comboCount
+
+            }
 
             // Game Over Sequence
             if (checkGameOver(board, 1, 1, cBlockType)) {
@@ -343,21 +355,24 @@ class Board extends React.Component {
               }
             }
           }
-
+          
           return {
             fallTimerCount: newTimerCount,
             canMove: canMove,
             board: board,
+            comboCount: comboCount,
             cBlockType: cBlockType,
             cBlockWidth: cBlockWidth,
             cBlockMaxWidth: cBlockMaxWidth,
             cBlockRot: cBlockRot,
-            x: x,
+            x: x
           };
+          
         });
       }.bind(this),
       this.state.dropSpeed
     );
+    
   }
 
   componentDidMount() {
