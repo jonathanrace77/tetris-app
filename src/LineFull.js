@@ -2,9 +2,6 @@ function lineFull(
   board
 ) {
   let count;
-  let lineFullComboCount = 0;
-
-console.log('comboCount into linefull', lineFullComboCount);
 
   for (let k = 19; k > 0; k--) {
     count = 0;
@@ -21,13 +18,12 @@ console.log('comboCount into linefull', lineFullComboCount);
           board[m][n] = board[m - 1][n];
         }
       }
-      lineFullComboCount++;
       k = 19;
       
     }  
   }
 
-  return [board, lineFullComboCount];
+  return board;
 }
 
 export default lineFull;

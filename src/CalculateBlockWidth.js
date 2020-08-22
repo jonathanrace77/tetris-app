@@ -1,5 +1,5 @@
 function CalculateBlockWidth(cBlockType, cBlockRot) {
-  if ((cBlockType == "line") && (cBlockRot === 0 || cBlockRot === 2)) {
+  if ((cBlockType === "line") && (cBlockRot === 0 || cBlockRot === 2)) {
     return 4;
   } else if ((cBlockType === "line") && (cBlockRot === 1 || cBlockRot === 3)) {
     return 1;

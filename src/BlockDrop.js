@@ -4,11 +4,8 @@ function BlockDrop(
   x,
   cBlockType,
   cBlockX,
-  cBlockY,
   cBlockRot,
   cBlockWidth,
-  canMove,
-  isDownPressed
 ) {
   if (x <= 10 - cBlockWidth + 1) {
     cBlockX = x;

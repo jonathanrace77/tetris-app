@@ -5,7 +5,6 @@ import Board from './Board';
 function App() {
   return (
     <div className="App">
-      Tetris APP
       <Board />
     </div>
   );

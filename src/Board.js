@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import BlockDrop from "./BlockDrop.js";
 import CalculateBlockWidth from "./CalculateBlockWidth.js";
 import CheckCanMove from "./CheckCanMove.js";
@@ -32,18 +32,18 @@ class Board extends React.Component {
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [1, 1, 1, 1, 1, 0, 1, 1, 1, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       ],
       dropSpeed: 450,
       key: 0,
       x: 3,
       fallTimerCount: 0,
-      cBlockType: 'line', //shapeGen(),
+      cBlockType: shapeGen(),
       cBlockX: 0,
       cBlockY: 0,
       cBlockRot: 0,
       cBlockMaxWidth: 4,
-      canMove: 1,
+      canMoveDown: 1,
       renderComplete: 1,
       score: 100,
       isDownPressed: 0,
@@ -53,7 +53,7 @@ class Board extends React.Component {
     this.fallLogic = this.fallLogic.bind(this);
     this.handleArrowKey = this.handleArrowKey.bind(this);
     this.fallTimer = this.fallTimer.bind(this);
-    this.moveBlockDown = this.moveBlockDown.bind(this);
+    this.arrowBlockDown = this.arrowBlockDown.bind(this);
   }
 
   // Builds initial board, includes CSS rules
@@ -80,7 +80,7 @@ class Board extends React.Component {
         return (
           <div
             style={
-              value === 1 ? styleFilled : value == 2 ? styleCurrent : styleEmpty
+              value === 1 ? styleFilled : value === 2 ? styleCurrent : styleEmpty
             }
             key={index}
           ></div>
@@ -90,25 +90,13 @@ class Board extends React.Component {
     return boardArray;
   }
 
-  // Handle Arrow Key Press Down
+  // Handles Arrow Key Press Down
   handleArrowKey(e) {
     this.setState({ iskeyFuncTriggered: 0 });
+
     if (e.key === "ArrowRight") {
       this.setState((prevState) => {
-        if (
-          CheckCanMoveLeftRight(
-            this.state.board,
-            this.state.fallTimerCount,
-            this.state.x,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            "right"
-          )
-        ) {
+        if (CheckCanMoveLeftRight(this.state.board, "right")) {
           return { x: prevState.x++ };
         }
       });
@@ -116,20 +104,7 @@ class Board extends React.Component {
 
     if (e.key === "ArrowLeft") {
       this.setState((prevState) => {
-        if (
-          CheckCanMoveLeftRight(
-            this.state.board,
-            this.state.fallTimerCount,
-            this.state.x,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            "left"
-          )
-        ) {
+        if (CheckCanMoveLeftRight(this.state.board, "left")) {
           return { x: prevState.x-- };
         }
       });
@@ -160,13 +135,9 @@ class Board extends React.Component {
         isDownPressed: 1,
       });
     }
-
-    if (e.key === "Enter") {
-      // For debug only
-    }
   }
 
-  // Handle Arrow Key Press Up
+  // Handles Arrow Key Press Up
   handleArrowKeyUp(e) {
     this.setState({ iskeyFuncTriggered: 0 });
     if (e.key === "ArrowDown") {
@@ -178,39 +149,23 @@ class Board extends React.Component {
 
   // Handles the fall sequence - refreshes every 1ms
   fallLogic() {
-    // Event listeners
-    document.addEventListener("keydown", (e) => {
-      if (!this.state.iskeyFuncTriggered) {
-        this.handleArrowKey(e);
-      }
-    });
-    document.addEventListener("keyup", (e) => {
-      if (!this.state.iskeyFuncTriggered) {
-        this.handleArrowKeyUp(e);
-      }
-    });
     // Loop for blocks to drop
     setInterval(
       function () {
         this.setState((prevState) => {
           var board = prevState.board;
-          var key = prevState.key;
           var cBlockType = prevState.cBlockType;
           var cBlockX = prevState.cBlockX;
-          var cBlockY = prevState.cBlockY;
           var cBlockRot = prevState.cBlockRot;
           var cBlockWidth = prevState.cBlockWidth;
           var fallTimerCount = prevState.fallTimerCount;
           var x = prevState.x;
-          //var canMove = prevState.canMove;
           var renderComplete = prevState.renderComplete;
-          var isDownPressed = prevState.isDownPressed;
 
-          let trialBoard = this.state.board;
-          let canMove = CheckCanMove(trialBoard);
+          var canMoveDown = CheckCanMove(board);
 
-          if (canMove) {
-            // Clear the board of current block
+          // Clear the board of current block if can move, then calls blockDrop()
+          if (canMoveDown) {
             for (let j = 0; j < 10; j++) {
               for (let k = 0; k < 20; k++) {
                 if (board[k][j] === 2) {
@@ -221,25 +176,20 @@ class Board extends React.Component {
 
             // Blocks to drop down function
             BlockDrop(
-              trialBoard,
+              board,
               fallTimerCount,
               x,
               cBlockType,
               cBlockX,
-              cBlockY,
               cBlockRot,
-              cBlockWidth,
-              canMove,
-              isDownPressed
+              cBlockWidth
             );
           }
 
-          this.setState(
-            // Checks if the block can move
-            {
-              canMove: canMove,
-            }
-          );
+          // Writes canMoveDown to state
+          this.setState({
+            canMoveDown: canMoveDown,
+          });
 
           return {
             board: board,
@@ -252,26 +202,20 @@ class Board extends React.Component {
     );
   }
 
-  moveBlockDown() {
+  // Handles down arrow movement - refreshes every 50ms
+  arrowBlockDown() {
     setInterval(
       function () {
         this.setState((prevState) => {
           var board = prevState.board;
           var fallTimerCount = prevState.fallTimerCount;
           var isDownPressed = prevState.isDownPressed;
-          let canMove = CheckCanMove(board);
+          let canMoveDown = CheckCanMove(board);
 
-          if (canMove) {
+          if (canMoveDown) {
             var additionalCount = 0;
             if (isDownPressed) {
               additionalCount++;
-              // Then make the block drop quicker somehow
-              this.setState(
-                // Checks if the block can move
-                {
-                  //fallTimerCount: (fallTimerCount + additionalCount)
-                }
-              );
             }
           }
 
@@ -289,64 +233,45 @@ class Board extends React.Component {
     );
   }
 
-  // This is the loop that resets every block drop (set by fallTimerCount)
+  // Handles timer of block dropping - refreshes according to fallTimerCount
   fallTimer() {
     setInterval(
       function () {
         this.setState((prevState) => {
           var board = prevState.board;
-          var canMove = prevState.canMove;
+          var canMoveDown = prevState.canMoveDown;
           var x = prevState.x;
           var newTimerCount = prevState.fallTimerCount;
           var cBlockType = prevState.cBlockType;
           var cBlockWidth = prevState.cBlockWidth;
           var cBlockMaxWidth = prevState.cBlockMaxWidth;
           var cBlockRot = prevState.cBlockRot;
-          var score = prevState.score;
           var comboCount = prevState.comboCount;
-          let comboToSend;
-
-          //newTimerCount = prevState.fallTimerCount++;
-
-          let secondCanMove = CheckCanMove(board);
 
           // Renders to BG and updates state as to whether the rendering is complete
-          if (!canMove) {
-            //renderComplete = 0;
+          if (!canMoveDown) {
             let returnFromRender = RenderToBG(board, 1);
-            //renderComplete = returnFromRender[1];
             board = returnFromRender[0];
           }
 
-          if (canMove && newTimerCount < 20) {
+          // Update the timer if able to move down
+          if (canMoveDown && newTimerCount < 20) {
             if (!prevState.isDownPressed) {
               newTimerCount = prevState.fallTimerCount++;
             }
           } else {
-            // Check for a complete line
-
-
-            
-
             newTimerCount = 0;
             cBlockType = shapeGen();
             cBlockWidth = CalculateBlockWidth(cBlockType, 0);
             cBlockRot = 0;
             x = 3;
 
-
-            let checkLineComplete = lineFull(board, comboCount);
-            board = checkLineComplete[0];
-            comboCount = checkLineComplete[1];
-            
-            
-            if(comboCount != 0){
-              comboToSend = comboCount
-
-            }
+            // Check for a complete line
+            let checkLineComplete = lineFull(board);
+            board = checkLineComplete;
 
             // Game Over Sequence
-            if (checkGameOver(board, 1, 1, cBlockType)) {
+            if (checkGameOver(board, cBlockType)) {
               this.setState({ score: 0 });
               for (let j = 0; j < 10; j++) {
                 for (let k = 0; k < 20; k++) {
@@ -355,37 +280,47 @@ class Board extends React.Component {
               }
             }
           }
-          
+
           return {
             fallTimerCount: newTimerCount,
-            canMove: canMove,
+            canMoveDown: canMoveDown,
             board: board,
             comboCount: comboCount,
             cBlockType: cBlockType,
             cBlockWidth: cBlockWidth,
             cBlockMaxWidth: cBlockMaxWidth,
             cBlockRot: cBlockRot,
-            x: x
+            x: x,
           };
-          
         });
       }.bind(this),
       this.state.dropSpeed
     );
-    
   }
 
   componentDidMount() {
     this.fallTimer();
     this.fallLogic();
-    this.moveBlockDown();
+    this.arrowBlockDown();
+    // Event listeners
+    document.addEventListener("keydown", (e) => {
+      if (!this.state.iskeyFuncTriggered) {
+        this.handleArrowKey(e);
+      }
+    });
+    document.addEventListener("keyup", (e) => {
+      if (!this.state.iskeyFuncTriggered) {
+        this.handleArrowKeyUp(e);
+      }
+    });
   }
 
   render() {
     return (
       <div>
+      <h1>Tetris</h1>
         <div className="Board">{this.boardCreator()}</div>
-        <div className="ScoreBoard">{this.state.score}</div>
+        <div className="ScoreBoard">{/*this.state.score*/}</div>
       </div>
     );
   }

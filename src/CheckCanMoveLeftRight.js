@@ -1,13 +1,5 @@
 function CheckCanMoveLeftRight(
   board,
-  fallTimer,
-  x,
-  cBlockType,
-  cBlockX,
-  cBlockY,
-  cBlockRot,
-  cBlockWidth,
-  canMove,
   LeftRight
 ) {
   let isThereATwo = 0;

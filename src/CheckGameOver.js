@@ -1,14 +1,4 @@
-function checkGameOver(
-  board,
-  i,
-  x,
-  cBlockType,
-  cBlockX,
-  cBlockY,
-  cBlockRot,
-  cBlockWidth,
-  canMove
-) {
+function checkGameOver(board, cBlockType) {
   let blockHeight = 1;
   if (
     cBlockType === "zee" ||
