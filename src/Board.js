@@ -45,9 +45,32 @@ class Board extends React.Component {
       cBlockMaxWidth: 4,
       canMoveDown: 1,
       renderComplete: 1,
-      score: 100,
+      score: 0,
       isDownPressed: 0,
-      comboCount: 5,
+      comboCount: 0,
+      linesToDelete: [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+      ],
+      linesToDrop: 0,
     };
     this.boardCreator = this.boardCreator.bind(this);
     this.fallLogic = this.fallLogic.bind(this);
@@ -80,7 +103,11 @@ class Board extends React.Component {
         return (
           <div
             style={
-              value === 1 ? styleFilled : value === 2 ? styleCurrent : styleEmpty
+              value === 1
+                ? styleFilled
+                : value === 2
+                ? styleCurrent
+                : styleEmpty
             }
             key={index}
           ></div>
@@ -161,7 +188,7 @@ class Board extends React.Component {
           var fallTimerCount = prevState.fallTimerCount;
           var x = prevState.x;
           var renderComplete = prevState.renderComplete;
-
+          var comboCount = prevState.comboCount;
           var canMoveDown = CheckCanMove(board);
 
           // Clear the board of current block if can move, then calls blockDrop()
@@ -244,9 +271,10 @@ class Board extends React.Component {
           var newTimerCount = prevState.fallTimerCount;
           var cBlockType = prevState.cBlockType;
           var cBlockWidth = prevState.cBlockWidth;
-          var cBlockMaxWidth = prevState.cBlockMaxWidth;
           var cBlockRot = prevState.cBlockRot;
           var comboCount = prevState.comboCount;
+          var linesToDelete = prevState.linesToDelete;
+          var score = prevState.score;
 
           // Renders to BG and updates state as to whether the rendering is complete
           if (!canMoveDown) {
@@ -267,18 +295,19 @@ class Board extends React.Component {
             x = 3;
 
             // Check for a complete line
-            let checkLineComplete = lineFull(board);
-            board = checkLineComplete;
+            let checkLineComplete = lineFull(board, comboCount, linesToDelete);
 
-            // Game Over Sequence
-            if (checkGameOver(board, cBlockType)) {
-              this.setState({ score: 0 });
-              for (let j = 0; j < 10; j++) {
-                for (let k = 0; k < 20; k++) {
-                  board[k][j] = 0;
-                }
-              }
-            }
+            //board = checkLineComplete[0];
+            comboCount = checkLineComplete[1];
+            linesToDelete = checkLineComplete[2];
+        
+            if(comboCount === 1){comboCount = 40};
+            if(comboCount === 2){comboCount = 100};
+            if(comboCount === 3){comboCount = 300};
+            if(comboCount === 4){comboCount = 1200};
+            score += comboCount;
+
+            comboCount = 0;
           }
 
           return {
@@ -288,11 +317,72 @@ class Board extends React.Component {
             comboCount: comboCount,
             cBlockType: cBlockType,
             cBlockWidth: cBlockWidth,
-            cBlockMaxWidth: cBlockMaxWidth,
             cBlockRot: cBlockRot,
             x: x,
+            linesToDelete: linesToDelete,
+            score: score,
           };
         });
+        // Handles clearing of lines
+        this.setState((prevState) => {
+          var board = prevState.board;
+          var cBlockType = prevState.cBlockType;
+          var linesToDelete = prevState.linesToDelete;
+          var linesToDrop = prevState.linesToDrop;
+
+          // Clear Full Lines
+          for (let m = 19; m > 0; m--) {
+            if (linesToDelete[m] === 1) {
+              for (let n = 0; n <= 9; n++) {
+                board[m][n] = 0;
+              }
+              linesToDelete[m] = 0;
+              linesToDrop++;
+              m = 19;
+            }
+          }
+
+          // Drop the blocks if there are any clear lines
+          while (linesToDrop > 0) {
+            for (let k = 19; k > 0; k--) {
+              let rowCount = 0;
+              for (let j = 0; j <= 9; j++) {
+                if (board[k][j] === 0) {
+                  rowCount++;
+                }
+              }
+              // If line is empty move everything above it down 1
+              if (rowCount === 10) {
+                for (let l = k; l > 0; l--) {
+                  for (let n = 0; n <= 9; n++) {
+                    board[l][n] = board[l - 1][n];
+                  }
+                }
+                linesToDrop--;
+                k = 20;
+              }
+              if (linesToDrop < 1) break;
+            }
+          }
+
+          // Game Over Sequence
+          if (checkGameOver(board, cBlockType)) {
+            this.setState({ score: 0 });
+            for (let j = 0; j < 10; j++) {
+              for (let k = 0; k < 20; k++) {
+                board[k][j] = 0;
+              }
+            }
+          }
+
+          return {
+            board: board,
+            cBlockType: cBlockType,
+            linesToDelete: linesToDelete,
+            linesToDrop: linesToDrop,
+          };
+        });
+        //console.log('Checkpoint 3 - Success - out of function');
       }.bind(this),
       this.state.dropSpeed
     );
@@ -317,10 +407,10 @@ class Board extends React.Component {
 
   render() {
     return (
-      <div>
-      <h1>Tetris</h1>
+      <div className="BoardContainer">
+        <h1>Tetris</h1>
         <div className="Board">{this.boardCreator()}</div>
-        <div className="ScoreBoard">{/*this.state.score*/}</div>
+        <div className="ScoreBoard">{this.state.score}</div>
       </div>
     );
   }

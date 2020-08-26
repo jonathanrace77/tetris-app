@@ -1,7 +1,7 @@
-function lineFull(
-  board
-) {
+function lineFull(board, combo, linesToDelete) {
   let count;
+  let comboCount = combo;
+  //let linesToDelete = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 
   for (let k = 19; k > 0; k--) {
     count = 0;
@@ -12,18 +12,12 @@ function lineFull(
     }
     // If line is full
     if (count === 10) {
-      // Move everything down one
-      for (let m = k; m > 0; m--) {
-        for (let n = 0; n <= 9; n++) {
-          board[m][n] = board[m - 1][n];
-        }
-      }
-      k = 19;
-      
-    }  
+      linesToDelete[k] = 1;
+      comboCount++;
+    }
   }
 
-  return board;
+  return [board, comboCount, linesToDelete];
 }
 
 export default lineFull;

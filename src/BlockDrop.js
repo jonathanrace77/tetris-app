@@ -1,19 +1,14 @@
-function BlockDrop(
-  board,
-  i,
-  x,
-  cBlockType,
-  cBlockX,
-  cBlockRot,
-  cBlockWidth,
-) {
+function BlockDrop(board, i, x, cBlockType, cBlockX, cBlockRot, cBlockWidth) {
+  //console.log('x', x);
+  //console.log('cBlockWidth', cBlockWidth);
+  /*
   if (x <= 10 - cBlockWidth + 1) {
     cBlockX = x;
   } else {
     cBlockX = 10 - cBlockWidth;
     x = 10 - cBlockWidth;
   }
-
+  */
   cBlockX = x;
 
   if (cBlockType === "line") {
