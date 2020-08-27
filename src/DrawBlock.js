@@ -1,14 +1,8 @@
-function BlockDrop(board, i, x, cBlockType, cBlockX, cBlockRot, cBlockWidth) {
-  //console.log('x', x);
-  //console.log('cBlockWidth', cBlockWidth);
-  /*
-  if (x <= 10 - cBlockWidth + 1) {
-    cBlockX = x;
-  } else {
-    cBlockX = 10 - cBlockWidth;
-    x = 10 - cBlockWidth;
-  }
-  */
+// This function handles drawing the blocks to the board.
+// It takes in i which is the vertical location (incremented by the fallTimer)
+// With i, it then calculates where the block is, depending on its type, x position and rotation.
+
+function drawBlock(board, i, x, cBlockType, cBlockX, cBlockRot) {
   cBlockX = x;
 
   if (cBlockType === "line") {
@@ -142,4 +136,4 @@ function BlockDrop(board, i, x, cBlockType, cBlockX, cBlockRot, cBlockWidth) {
   }
 }
 
-export default BlockDrop;
+export default drawBlock;
