@@ -119,16 +119,20 @@ class App extends React.Component {
 
     if (e.key === "ArrowRight") {
       this.setState((prevState) => {
+        let blockX = prevState.blockX;
         if (canBlockMoveLeftRight(this.state.board, "right", 1)) {
-          return { blockX: prevState.blockX++ };
+          blockX++;
+          return { blockX: blockX };
         }
       });
     }
 
     if (e.key === "ArrowLeft") {
       this.setState((prevState) => {
+        let blockX = prevState.blockX;
         if (canBlockMoveLeftRight(this.state.board, "left", 1)) {
-          return { blockX: prevState.blockX-- };
+          blockX--;
+          return { blockX: blockX };
         }
       });
     }
@@ -185,12 +189,10 @@ class App extends React.Component {
           var board = prevState.board;
           var blockType = prevState.blockType;
           var blockRot = prevState.blockRot;
-          var cBlockWidth = prevState.cBlockWidth;
           var blockY = prevState.blockY;
           var blockX = prevState.blockX;
           var isRenderComplete = prevState.isRenderComplete;
           var canMoveDown = canBlockMoveDown(board);
-
           // Clear the board of current block if can move, then calls drawBlock()
           if (canMoveDown) {
             for (let j = 0; j < 10; j++) {
@@ -200,16 +202,13 @@ class App extends React.Component {
                 }
               }
             }
-
             // Blocks to drop down function
             DrawBlock(
               board,
+              blockX,
               blockY,
-              blockX,
               blockType,
-              blockX,
               blockRot,
-              cBlockWidth
             );
           }
 
@@ -220,7 +219,7 @@ class App extends React.Component {
 
           return {
             board: board,
-            blockX: blockX,
+            //blockX: blockX,
             isRenderComplete: isRenderComplete,
           };
         });
@@ -267,7 +266,6 @@ class App extends React.Component {
         this.setState((prevState) => {
           var board = prevState.board;
           var canMoveDown = prevState.canMoveDown;
-          var blockX = prevState.blockX;
           var newTimerCount = prevState.blockY;
           var blockType = prevState.blockType;
           var cBlockWidth = prevState.cBlockWidth;
@@ -275,6 +273,7 @@ class App extends React.Component {
           var comboCount = prevState.comboCount;
           var linesToDelete = prevState.linesToDelete;
           var score = prevState.score;
+          var blockX = prevState.blockX;
 
           // Renders to BG and updates state as to whether the rendering is complete
           if (!canMoveDown) {
@@ -285,7 +284,8 @@ class App extends React.Component {
           // Update the timer if able to move down
           if (canMoveDown && newTimerCount < 20) {
             if (!prevState.isDownPressed) {
-              newTimerCount = prevState.blockY++;
+              console.log('Checkpoint 1 - Success - Will increase timer count');
+              newTimerCount++;
             }
           } else {
             newTimerCount = 0;
@@ -392,7 +392,6 @@ class App extends React.Component {
             linesToDelete: linesToDelete,
           };
         });
-        //console.log('Checkpoint 3 - Success - out of function');
       }.bind(this),
       this.state.dropSpeed
     );

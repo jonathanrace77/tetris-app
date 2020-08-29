@@ -2,9 +2,7 @@
 // It takes in i which is the vertical location (incremented by the fallTimer)
 // With i, it then calculates where the block is, depending on its type, x position and rotation.
 
-function drawBlock(board, i, x, cBlockType, cBlockX, cBlockRot) {
-  cBlockX = x;
-
+function drawBlock(board, cBlockX, i, cBlockType, cBlockRot) {
   if (cBlockType === "line") {
     // Writes current block
     if (i < 20 && (cBlockRot === 0 || cBlockRot === 2)) {
